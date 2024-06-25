@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        Hi, {{name}}
+        {% if compliments %}
+            you're so: 
+            <ul>
+                {% for word in compliments %}
+                    <li>
+                        {{word}}
+                    </li>
+                {%endfor%}
+            </ul>
+        {% endif %}
+    </body>
+</html>

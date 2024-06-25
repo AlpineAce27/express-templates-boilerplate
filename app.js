@@ -16,7 +16,10 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(rootDir, 'public')));
-
+nunjucks.configure('views', {
+  autoescape: true,
+  express: app,
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}...`);
@@ -37,3 +40,61 @@ const COMPLIMENTS = [
   'smashing',
   'lovely',
 ];
+
+const sayHello = (request, response) => {
+  response.send("Hello client!")
+}
+
+app.get('/hello', sayHello)
+
+app.get('/', (request, response) => {
+response.render('home.html')
+})
+
+app.get('/form', (request, response) => {
+  response.render('form.html')
+})
+
+app.get('/welcome', (request, response) =>{
+  console.log(request.query)
+  response.send(`Welcome to the webpage, ${request.query.person}`)
+})
+
+app.get('/number-form', (request, response) => {
+  response.render('number-form.html')
+})
+
+app.post('/fav-number', (request, response) => {
+  //console.log(request.body)
+  const favNumber = request.body.favNumber
+  response.send( `Your favorite number is ${favNumber}`)
+})
+
+app.get(`/users/:username`, (request, response) =>{
+  //console.log(request.params)
+  response.send(`This is the info page for ${request.params.username}`)
+})
+
+app.get(`/template-demo`, (request, response) => {
+  const date = new Date()
+  const formattedDate = `${date.toDateString()} ${date.toLocaleTimeString()}`
+  console.log(formattedDate)
+  response.render(`template-demo.html.njk`, {date: formattedDate})
+})
+
+app.get(`/greet`, (request, response) => {
+  const person = request.query.person
+  const doTheyWantCompliments = request.query.wantsCompliments
+
+  const randomCompliments = lodash.sampleSize(COMPLIMENTS, 3)
+
+  response.render('greet.html.njk', {
+    name: person,
+    compliments: doTheyWantCompliments? randomCompliments : [],
+  })
+
+})
+
+app.get(`/inherit`, (request, response) => {
+  response.render(`inherit.html.njk`)
+})
